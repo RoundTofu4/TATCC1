@@ -1,10 +1,18 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
+const mysql = require('mysql2');
 
 exports.register = (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
+  const dbcn = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  });
+  dbcn.connect();
 
   User.create({ username, password: hashedPassword }, (err, result) => {
     if (err) return res.status(500).send(err);
